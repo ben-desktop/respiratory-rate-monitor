@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Respiratory Rate Monitor</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",sans-serif}
+body{display:flex;align-items:center;justify-content:center;padding:18px}
+#app{width:min(420px,100%);display:flex;flex-direction:column;gap:16px}
+.card{background:#111;border:4px solid #fff;border-radius:24px;transition:border-color .25s ease}
+#rrCard{padding:28px;text-align:center}
+#rrValue{font-size:88px;font-weight:700;line-height:1}
+#rrUnit{font-size:28px;color:#aaa}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.small{background:#111;border-radius:20px;padding:18px;text-align:center}
+.label{color:#8d8d8d;font-size:14px;margin-bottom:8px}
+.value{font-size:32px;font-weight:600}
+button{border:none;border-radius:20px;font-size:22px;font-weight:700;padding:20px;cursor:pointer}
+#tap{background:#0A84FF;color:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row button{background:#222;color:#fff}
+#flash{position:fixed;inset:0;opacity:0;pointer-events:none;transition:opacity .12s}
+</style>
+</head>
+<body>
+<div id="flash"></div>
+<div id="app">
+<div id="rrCard" class="card">
+<div id="rrValue">--</div>
+<div id="rrUnit">BPM</div>
+</div>
+
+<div class="stats">
+<div class="small"><div class="label">Stopwatch</div><div id="time" class="value">00:00.00</div></div>
+<div class="small"><div class="label">Breaths</div><div id="breaths" class="value">0</div></div>
+</div>
+
+<button id="tap">TAP TO RECORD INHALE</button>
+
+<div class="row">
+<button id="pause">Pause</button>
+<button id="clear">Clear</button>
+</div>
+</div>
+
+<script>
+const rr=document.getElementById("rrValue");
+const card=document.getElementById("rrCard");
+const t=document.getElementById("time");
+const b=document.getElementById("breaths");
+const tap=document.getElementById("tap");
+const pause=document.getElementById("pause");
+const clear=document.getElementById("clear");
+const flash=document.getElementById("flash");
+
+let started=false,running=false,paused=false,inhale=true;
+let start=0,pauseAt=0,pausedMs=0,elapsed=0,breaths=0,lastTap=0;
+let raf=0;
+
+function fmt(s){
+ let h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=Math.floor(s%60),hs=Math.floor((s-Math.floor(s))*100);
+ const p=n=>String(n).padStart(2,"0");
+ return h?`${p(h)}:${p(m)}:${p(sec)}.${p(hs)}`:`${p(m)}:${p(sec)}.${p(hs)}`;
+}
+function loop(now){
+ if(running){
+   elapsed=(now-start-pausedMs)/1000;
+   t.textContent=fmt(elapsed);
+ }
+ raf=requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function updateRR(){
+ if(!breaths||elapsed<=0){rr.textContent="0";card.style.borderColor="#fff";return;}
+ const bpm=Math.round((breaths*60)/elapsed);
+ rr.textContent=bpm;
+ card.style.borderColor=bpm<12?"#0A84FF":bpm<=20?"#fff":bpm<=29?"orange":"#ff3b30";
+}
+function vib(){if(navigator.vibrate)navigator.vibrate(10);}
+function blink(c){
+ flash.style.background=c;
+ flash.style.opacity=.12;
+ setTimeout(()=>flash.style.opacity=0,120);
+}
+
+tap.onclick=()=>{
+ const now=performance.now();
+ if(now-lastTap<250)return;
+ lastTap=now;
+
+ if(!started){
+   started=true;
+   running=true;
+   start=performance.now();
+ }
+
+ vib();
+
+ if(inhale){
+   blink("#00ff66");
+   tap.textContent="TAP TO RECORD EXHALE";
+ }else{
+   blink("#0A84FF");
+   breaths++;
+   b.textContent=breaths;
+   updateRR();
+   tap.textContent="TAP TO RECORD INHALE";
+ }
+ inhale=!inhale;
+};
+
+pause.onclick=()=>{
+ if(!started)return;
+ if(running){
+   running=false;
+   paused=true;
+   pauseAt=performance.now();
+   pause.textContent="Resume";
+ }else if(paused){
+   pausedMs+=performance.now()-pauseAt;
+   running=true;
+   paused=false;
+   pause.textContent="Pause";
+ }
+};
+
+clear.onclick=()=>{
+ started=false;running=false;paused=false;inhale=true;
+ start=0;pauseAt=0;pausedMs=0;elapsed=0;breaths=0;lastTap=0;
+ rr.textContent="--";
+ t.textContent="00:00.00";
+ b.textContent="0";
+ tap.textContent="TAP TO RECORD INHALE";
+ pause.textContent="Pause";
+ card.style.borderColor="#fff";
+};
+</script>
+</body>
+</html>
