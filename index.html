@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Respiratory Rate Monitor</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+    color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    user-select:none;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.app{
+    width:min(430px,100vw);
+    height:100vh;
+    padding:22px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:18px;
+}
+
+.rate-card{
+    position:relative;
+    flex:0 0 auto;
+    background:#fff;
+    border:6px solid #ffffff;
+    border-radius:30px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:180px;
+    transition:
+        border-color .25s,
+        transform .15s,
+        box-shadow .25s;
+}
+
+.rate-card.blue{
+    border-color:#2d8cff;
+}
+
+.rate-card.normal{
+    border-color:#ffffff;
+}
+
+.rate-card.orange{
+    border-color:#ff9800;
+}
+
+.rate-card.red{
+    border-color:#ff3b30;
+}
+
+.rate{
+    font-size:92px;
+    line-height:1;
+    font-weight:800;
+    color:#000;
+    letter-spacing:-3px;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+}
+
+.stat{
+    background:#111;
+    border-radius:22px;
+    padding:18px;
+    text-align:center;
+}
+
+.label{
+    font-size:14px;
+    color:#9b9b9b;
+    margin-bottom:8px;
+}
+
+.value{
+    font-size:42px;
+    font-weight:700;
+}
+
+.lastCard{
+    background:#111;
+    border-radius:22px;
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.lastLabel{
+    color:#9b9b9b;
+    font-size:14px;
+}
+
+.lastValue{
+    font-size:34px;
+    font-weight:700;
+}
+
+.confidenceWrap{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.confidenceTitle{
+    color:#9b9b9b;
+    font-size:14px;
+}
+
+.confidenceBar{
+    width:100%;
+    height:16px;
+    background:#222;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.confidenceFill{
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#0a84ff,#30d158);
+    transition:width .35s ease;
+}
+
+.tapButton{
+    border:none;
+    border-radius:28px;
+    background:#0a84ff;
+    color:#fff;
+    font-size:28px;
+    font-weight:700;
+    min-height:92px;
+    cursor:pointer;
+    transition:
+        transform .08s,
+        background .2s;
+}
+
+.tapButton:active{
+    transform:scale(.98);
+}
+
+.controls{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+
+.controlButton{
+    border:none;
+    border-radius:20px;
+    min-height:62px;
+    font-size:22px;
+    font-weight:700;
+    color:#fff;
+    background:#2c2c2e;
+    cursor:pointer;
+}
+
+.flash{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .18s;
+}
+
+.flash.show{
+    opacity:.22;
+}
+
+.flash.inhale{
+    background:#30d158;
+}
+
+.flash.exhale{
+    background:#0a84ff;
+}
+
+@media (max-height:760px){
+
+.rate-card{
+    min-height:150px;
+}
+
+.rate{
+    font-size:78px;
+}
+
+.value{
+    font-size:34px;
+}
+
+.lastValue{
+    font-size:28px;
+}
+
+.tapButton{
+    min-height:82px;
+    font-size:24px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="flash" class="flash"></div>
+
+<div class="app">
+
+    <div id="rateCard" class="rate-card normal">
+        <div id="rateDisplay" class="rate">0</div>
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+            <div class="label">Elapsed</div>
+            <div id="elapsedDisplay" class="value">0s</div>
+        </div>
+
+        <div class="stat">
+            <div class="label">Breaths</div>
+            <div id="breathsDisplay" class="value">0</div>
+        </div>
+
+    </div>
+
+    <div class="lastCard">
+
+        <div class="lastLabel">
+            Last Recorded
+        </div>
+
+        <div id="lastDisplay" class="lastValue">
+            —
+        </div>
+
+    </div>
+
+    <div class="confidenceWrap">
+
+        <div class="confidenceTitle">
+            Confidence
+        </div>
+
+        <div class="confidenceBar">
+            <div id="confidenceFill" class="confidenceFill"></div>
+        </div>
+
+    </div>
+
+    <button id="tapButton" class="tapButton">
+        TAP TO RECORD INHALE
+    </button>
+
+    <div class="controls">
+
+        <button id="pauseButton" class="controlButton">
+            Pause
+        </button>
+
+        <button id="clearButton" class="controlButton">
+            Clear
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const rateCard=document.getElementById("rateCard");
+const rateDisplay=document.getElementById("rateDisplay");
+
+const elapsedDisplay=document.getElementById("elapsedDisplay");
+const breathsDisplay=document.getElementById("breathsDisplay");
+
+const lastDisplay=document.getElementById("lastDisplay");
+
+const tapButton=document.getElementById("tapButton");
+const pauseButton=document.getElementById("pauseButton");
+const clearButton=document.getElementById("clearButton");
+
+const confidenceFill=document.getElementById("confidenceFill");
+
+const flash=document.getElementById("flash");
+
+let running=false;
+let paused=false;
+
+let expectingInhale=true;
+
+let completedBreaths=0;
+
+let startTime=null;
+let elapsedBeforePause=0;
+let pauseStarted=null;
+
+let timer=null;
+
+let lastTap=0;
+
+const TAP_LOCK=250;
+
+function updateTimer(){
+
+    if(!running || paused) return;
+
+    const elapsed=(Date.now()-startTime+elapsedBeforePause)/1000;
+
+    elapsedDisplay.textContent=formatElapsed(elapsed);
+
+    updateRate(elapsed);
+
+}
+
+function formatElapsed(seconds){
+
+    if(seconds<60){
+        return Math.floor(seconds)+"s";
+    }
+
+    const mins=Math.floor(seconds/60);
+    const secs=Math.floor(seconds%60);
+
+    return mins+"m "+secs+"s";
+
+}
+
+function updateRate(elapsed){
+
+    if(completedBreaths===0 || elapsed<=0){
+        rateDisplay.textContent="0";
+        setBorder(0);
+        confidenceFill.style.width="0%";
+        return;
+    }
+
+    const rate=(completedBreaths*60)/elapsed;
+
+    const rounded=Math.round(rate);
+
+    rateDisplay.textContent=rounded;
+
+    lastDisplay.textContent=rounded+" bpm";
+
+    setBorder(rounded);
+
+    updateConfidence();
+
+}
+
+function setBorder(rate){
+
+    rateCard.classList.remove(
+        "blue",
+        "normal",
+        "orange",
+        "red"
+    );
+
+    if(rate<12){
+        rateCard.classList.add("blue");
+    }
+    else if(rate<=20){
+        rateCard.classList.add("normal");
+    }
+    else if(rate<=29){
+        rateCard.classList.add("orange");
+    }
+    else{
+        rateCard.classList.add("red");
+    }
+
+}
+
+function updateConfidence(){
+
+    let confidence=completedBreaths*10;
+
+    if(confidence>100){
+        confidence=100;
+    }
+
+    confidenceFill.style.width=confidence+"%";
+
+}
+
+function vibrate(){
+
+    if(navigator.vibrate){
+        navigator.vibrate(10);
+    }
+
+}
+
+function flashScreen(type){
+
+    flash.className="flash show "+type;
+
+    setTimeout(()=>{
+        flash.className="flash";
+    },150);
+
+}
+
+function handleTap(){
+
+    const now=Date.now();
+
+    if(now-lastTap<TAP_LOCK){
+        return;
+    }
+
+    lastTap=now;
+
+    if(paused){
+        return;
+    }
+
+    vibrate();
+
+    if(!running){
+
+        running=true;
+
+        startTime=Date.now();
+
+        timer=setInterval(updateTimer,250);
+
+    }
+
+    if(expectingInhale){
+
+        flashScreen("inhale");
+
+        tapButton.textContent="TAP TO RECORD EXHALE";
+
+        expectingInhale=false;
+
+    }
+    else{
+
+        flashScreen("exhale");
+
+        completedBreaths++;
+
+        breathsDisplay.textContent=completedBreaths;
+
+        tapButton.textContent="TAP TO RECORD INHALE";
+
+        expectingInhale=true;
+
+        updateTimer();
+
+    }
+
+}
+
+function pauseResume(){
+
+    if(!running){
+        return;
+    }
+
+    if(!paused){
+
+        paused=true;
+
+        pauseStarted=Date.now();
+
+        clearInterval(timer);
+
+        pauseButton.textContent="Resume";
+
+    }
+    else{
+
+        paused=false;
+
+        elapsedBeforePause+=Date.now()-pauseStarted;
+
+        timer=setInterval(updateTimer,250);
+
+        pauseButton.textContent="Pause";
+
+    }
+
+}
+
+function clearAll(){
+
+    clearInterval(timer);
+
+    running=false;
+
+    paused=false;
+
+    expectingInhale=true;
+
+    completedBreaths=0;
+
+    startTime=null;
+
+    elapsedBeforePause=0;
+
+    pauseStarted=null;
+
+    lastTap=0;
+
+    rateDisplay.textContent="0";
+
+    breathsDisplay.textContent="0";
+
+    elapsedDisplay.textContent="0s";
+
+    lastDisplay.textContent="—";
+
+    confidenceFill.style.width="0%";
+
+    rateCard.className="rate-card normal";
+
+    tapButton.textContent="TAP TO RECORD INHALE";
+
+    pauseButton.textContent="Pause";
+
+}
+
+tapButton.addEventListener("click",handleTap);
+
+pauseButton.addEventListener("click",pauseResume);
+
+clearButton.addEventListener("click",clearAll);
+
+clearAll();
+
+</script>
+
+</body>
+</html>
