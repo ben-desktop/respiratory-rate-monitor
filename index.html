@@ -79,10 +79,16 @@ body{
 
 display:flex;
 
-justify-content:center;
+justify-content:flex-start;
+
 align-items:center;
 
-padding:18px;
+padding:
+max(18px, env(safe-area-inset-top))
+18px
+max(18px, env(safe-area-inset-bottom));
+
+overflow-y:auto;
 
 }
 
@@ -93,6 +99,8 @@ padding:18px;
 #app{
 
 width:min(430px,100%);
+
+margin:auto;
 
 display:flex;
 
