@@ -606,7 +606,7 @@ NAME:"Res-Rate",
 
 YEAR:"2026",
 
-VERSION:"v2.3"
+VERSION:"v2.4"
 
 };
 
@@ -671,8 +671,6 @@ const previous=document.getElementById("previous");
 
 const earlier=document.getElementById("earlier");
 
-const quality=document.getElementById("quality");
-
 const qualityText=document.getElementById("qualityText");
 
 const qualityDots=document.getElementById("qualityDots");
@@ -706,15 +704,13 @@ let lastInhaleTime=0;
 
 let inhaleTimes=[];
 
-/* Current + previous history */
+/* Measurement State */
 
 let currentRR=null;
 
 let previousRR=null;
 
 let earlierHistory=[];
-
-let qualityStable=false;
 
 let staleResetRequired=false;
 
@@ -725,6 +721,17 @@ let qualityStartIntervals=0;
 let dotsFrame=0;
 
 const dots=["",".","..","..."];
+const QUALITY_COLOURS={
+
+WAITING:"var(--secondary)",
+
+COLLECTING:"var(--blue)",
+
+IMPROVING:"var(--orange)",
+
+STABLE:"var(--green)"
+
+};
 
 /* =====================================================
    UTILITIES
@@ -873,8 +880,11 @@ qualityText.textContent=
 
 qualityDots.textContent="";
 
-quality.style.color=
-"var(--secondary)";
+qualityText.style.color=
+QUALITY_COLOURS.WAITING;
+
+qualityDots.style.color=
+QUALITY_COLOURS.WAITING;
 
 rrCard.classList.remove("stale");
 
@@ -899,11 +909,13 @@ if(stale>=CONFIG.QUALITY_STALE_TIME){
 qualityText.textContent=
 "Waiting for new data";
 
-quality.style.color="var(--orange)";
+qualityText.style.color=
+QUALITY_COLOURS.IMPROVING;
+
+qualityDots.style.color=
+QUALITY_COLOURS.IMPROVING;
 
 rrCard.classList.add("stale");
-
-qualityStable=false;
 
 staleResetRequired=true;
 
@@ -918,8 +930,11 @@ if(intervals<3){
 qualityText.textContent=
 "Collecting data";
 
-quality.style.color=
-"var(--blue)";
+qualityText.style.color=
+QUALITY_COLOURS.COLLECTING;
+
+qualityDots.style.color=
+QUALITY_COLOURS.COLLECTING;
 
 return;
 
@@ -940,20 +955,25 @@ qualityElapsed<CONFIG.QUALITY_READY_TIME
 qualityText.textContent=
 "Improving accuracy";
 
-quality.style.color=
-"var(--orange)";
+qualityText.style.color=
+QUALITY_COLOURS.IMPROVING;
+
+qualityDots.style.color=
+QUALITY_COLOURS.IMPROVING;
 
 return;
 
 }
 
-qualityStable=true;
 
 qualityText.textContent=
-"✓ Rolling measurement stable";
+"✓ Rolling measurement stable ✓";
 
-quality.style.color=
-"var(--green)";
+qualityText.style.color=
+QUALITY_COLOURS.STABLE;
+
+qualityDots.style.color=
+QUALITY_COLOURS.STABLE;
 }
 
 /* =====================================================
@@ -1006,7 +1026,7 @@ previous.textContent="Previous: --";
 
 earlier.textContent="Earlier: --";
 
-   currentRR=null;
+currentRR=null;
 previousRR=null;
 earlierHistory=[];
 
@@ -1189,18 +1209,7 @@ return;
 lastTapTime=now;
 
 lastInhaleTime=now;
-if(staleResetRequired){
 
-qualityStartTime=now;
-
-/* Start counting from the NEXT completed interval */
-qualityStartIntervals=inhaleTimes.length;
-
-qualityStable=false;
-
-staleResetRequired=false;
-
-}
 
 if(!measurementStarted){
 
@@ -1216,6 +1225,17 @@ qualityStartIntervals=0;
 flashButton();
 
 inhaleTimes.push(now);
+   if(staleResetRequired){
+
+qualityStartTime=now;
+
+/* Start counting from the NEXT completed interval */
+qualityStartIntervals=inhaleTimes.length-1;
+
+
+staleResetRequired=false;
+
+}
 
 inhaleCount.textContent=
 
@@ -1240,7 +1260,6 @@ lastTapTime=0;
 lastInhaleTime=0;
 
 inhaleTimes=[];
-   qualityStable=false;
 
 staleResetRequired=false;
 
@@ -1262,18 +1281,16 @@ status.textContent="READY";
 
 status.style.color="#FFFFFF";
 
-previous.textContent="Previous: --";
-
-earlier.textContent="Earlier: --";
+updateHistoryDisplay();
 
 qualityText.textContent=
 "Waiting for first inhale";
+   qualityText.style.color=
+QUALITY_COLOURS.WAITING;
+
+qualityDots.style.color=
+QUALITY_COLOURS.WAITING;
    qualityDots.textContent="";
-   qualityStable=false;
-
-quality.style.color=
-
-"var(--secondary)";
 
 rrCard.classList.remove("stale");
 
@@ -1342,6 +1359,12 @@ trend.textContent="→";
 
 qualityText.textContent=
 "Waiting for first inhale";
+
+qualityText.style.color=
+QUALITY_COLOURS.WAITING;
+
+qualityDots.style.color=
+QUALITY_COLOURS.WAITING;
 
 qualityDots.textContent="";
 
