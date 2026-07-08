@@ -697,7 +697,11 @@ let inhaleTimes=[];
 
 /* Current + previous history */
 
-let rrHistory=[];
+let currentRR=null;
+
+let previousRR=null;
+
+let earlierHistory=[];
 
 let qualityStable=false;
 
@@ -819,6 +823,30 @@ colour:"var(--red)"
 ===================================================== */
 
 function updateHistoryDisplay(){
+
+previous.textContent=
+
+previousRR!==null
+
+?`Previous: ${previousRR} rpm`
+
+:"Previous: --";
+
+if(earlierHistory.length){
+
+earlier.textContent=
+
+"Earlier: "+
+
+earlierHistory.join(" • ");
+
+}else{
+
+earlier.textContent="Earlier: --";
+
+}
+
+}
 
 previous.textContent=
 
@@ -1044,11 +1072,9 @@ const rr=Math.round(
 
 /* Trend */
 
-if(rrHistory.length){
+if(currentRR!==null){
 
-const previousRR=rrHistory[0];
-
-if(rr>previousRR){
+if(rr>currentRR){
 
 trend.textContent="↑";
 
@@ -1070,9 +1096,20 @@ trend.textContent="→";
 
 /* Update history */
 
-rrHistory.unshift(rr);
+if(currentRR!==null){
 
-rrHistory=rrHistory.slice(0,5);
+if(previousRR!==null){
+
+earlierHistory.unshift(previousRR);
+
+earlierHistory=earlierHistory.slice(0,3);
+
+}
+   previousRR=currentRR;
+
+}
+
+currentRR=rr;
 
 rrValue.textContent=rr;
 
@@ -1221,7 +1258,11 @@ lastInhaleTime=0;
 
 inhaleTimes=[];
 
-rrHistory=[];
+currentRR=null;
+
+previousRR=null;
+
+earlierHistory=[];
 
 rrValue.textContent="--";
 
