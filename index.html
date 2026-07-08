@@ -556,11 +556,11 @@ DOUBLE_TAP_MS:250,
 
 BUTTON_FLASH_MS:180,
 
-QUALITY_READY_INTERVALS:8,
+QUALITY_READY_INTERVALS:6,
 
-QUALITY_READY_TIME:30000,
+QUALITY_READY_TIME:20000,
 
-QUALITY_STALE_TIME:20000,
+QUALITY_STALE_TIME:15000,
 
 STATUS:{
 
@@ -630,6 +630,14 @@ let inhaleTimes=[];
 /* Current + previous history */
 
 let rrHistory=[];
+
+let qualityStable=false;
+
+let staleResetRequired=false;
+
+let qualityStartTime=0;
+
+let qualityStartIntervals=0;
 
 /* =====================================================
    UTILITIES
@@ -811,13 +819,17 @@ quality.style.color=
 
 rrCard.classList.add("stale");
 
+qualityStable=false;
+
+staleResetRequired=true;
+
 return;
 
 }
 
 rrCard.classList.remove("stale");
 
-if(intervals<4){
+if(intervals<3){
 
 quality.textContent=
 "Collecting data...";
@@ -829,11 +841,19 @@ return;
 
 }
 
+const qualityIntervals=
+
+intervals-qualityStartIntervals;
+
+const qualityElapsed=
+
+now-qualityStartTime;
+
 if(
 
-intervals<CONFIG.QUALITY_READY_INTERVALS||
+qualityIntervals<CONFIG.QUALITY_READY_INTERVALS ||
 
-elapsed<CONFIG.QUALITY_READY_TIME
+qualityElapsed<CONFIG.QUALITY_READY_TIME
 
 ){
 
@@ -847,8 +867,10 @@ return;
 
 }
 
+qualityStable=true;
+
 quality.textContent=
-"✓ Stable rolling measurement";
+"✓ Rolling measurement stable";
 
 quality.style.color=
 "var(--green)";
@@ -1035,6 +1057,17 @@ return;
 lastTapTime=now;
 
 lastInhaleTime=now;
+   if(staleResetRequired){
+
+qualityStartTime=now;
+
+qualityStartIntervals=
+
+Math.max(0, inhaleTimes.length-1);
+
+staleResetRequired=false;
+
+}
 
 if(!measurementStarted){
 
@@ -1042,8 +1075,11 @@ measurementStarted=true;
 
 measurementStart=now;
 
-}
+qualityStartTime=now;
 
+qualityStartIntervals=0;
+
+}
 flashButton();
 
 inhaleTimes.push(now);
