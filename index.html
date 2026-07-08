@@ -291,8 +291,6 @@ padding:14px 20px 16px;
 
 #quality{
 
-position:relative;
-
 display:flex;
 
 justify-content:center;
@@ -314,15 +312,19 @@ transform .25s ease;
 
 }
 
+#qualityText{
+
+display:inline;
+
+}
+
 #qualityDots{
 
-position:absolute;
-
-left:50%;
-
-margin-left:calc(50% - 8px);
+display:inline-block;
 
 width:18px;
+
+margin-left:2px;
 
 text-align:left;
 
@@ -332,8 +334,7 @@ transition:
 opacity .2s ease,
 transform .2s ease;
 
-}
-   
+}   
 /* =====================================================
    LOWER CARDS
 ===================================================== */
@@ -892,6 +893,7 @@ qualityText.textContent=
 "Waiting for first inhale";
 
 qualityDots.textContent="";
+qualityDots.style.display="none";
 
 qualityText.style.color=
 QUALITY_COLOURS.WAITING;
@@ -1014,6 +1016,7 @@ qualityDots.textContent=dots[dotsFrame];
 }else{
 
 qualityDots.textContent="";
+qualityDots.style.display="none";
 
 }
 
@@ -1304,6 +1307,7 @@ QUALITY_COLOURS.WAITING;
 qualityDots.style.color=
 QUALITY_COLOURS.WAITING;
    qualityDots.textContent="";
+qualityDots.style.display="none";
 
 rrCard.classList.remove("stale");
 
@@ -1380,6 +1384,7 @@ qualityDots.style.color=
 QUALITY_COLOURS.WAITING;
 
 qualityDots.textContent="";
+qualityDots.style.display="none";
 
 updateHistoryDisplay();
 
