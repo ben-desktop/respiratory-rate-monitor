@@ -145,7 +145,7 @@ transform .25s ease;
 
 .card.stale{
 
-opacity:.72;
+opacity:.82;
 
 }
 
@@ -202,7 +202,10 @@ font-size:24px;
 
 color:var(--secondary);
 
-transition:.2s;
+transition:
+color .2s ease,
+transform .2s ease,
+opacity .2s ease;
 
 }
 
@@ -253,8 +256,9 @@ font-size:14px;
 color:var(--secondary);
 
 transition:
-opacity .2s ease,
-transform .2s ease;
+opacity .25s ease,
+transform .25s ease,
+color .25s ease;
 
 }
 
@@ -273,13 +277,13 @@ color:var(--secondary);
 
 #qualityCard{
 
-padding:16px 20px;
+padding:14px 20px 16px;
 
 }
 
 #quality{
 
-display:flex;
+display:flex; 
 
 justify-content:center;
 
@@ -297,7 +301,8 @@ color:var(--secondary);
 
 transition:
 color .25s ease,
-opacity .25s ease;
+opacity .25s ease,
+transform .25s ease;
 
 }
 
@@ -310,6 +315,10 @@ width:18px;
 text-align:left;
 
 font-variant-numeric:tabular-nums;
+
+   transition:
+opacity .2s ease,
+transform .2s ease;
 
 }
 /* =====================================================
@@ -436,7 +445,9 @@ color:var(--tertiary);
 
 opacity:.6;
 
-margin-top:4px;
+margin-top:8px;
+
+padding-bottom:4px;
 
 pointer-events:none;
 
@@ -848,31 +859,6 @@ earlier.textContent="Earlier: --";
 
 }
 
-previous.textContent=
-
-rrHistory.length>1
-
-?`Previous: ${rrHistory[1]} rpm`
-
-:"Previous: --";
-
-if(rrHistory.length>2){
-
-earlier.textContent=
-
-"Earlier: "+
-
-rrHistory
-.slice(2,5)
-.join(" • ");
-
-}else{
-
-earlier.textContent="Earlier: --";
-
-}
-
-}
 
 /* =====================================================
    MEASUREMENT QUALITY
@@ -896,16 +882,13 @@ return;
 
 }
 
-const intervals=
+const intervals=Math.max(0, inhaleTimes.length-1);
 
-Math.max(
+const qualityIntervals=Math.max(
 0,
-inhaleTimes.length-1
+intervals-qualityStartIntervals
 );
 
-const elapsed=
-
-now-measurementStart;
 
 const stale=
 
@@ -913,11 +896,10 @@ now-lastInhaleTime;
 
 if(stale>=CONFIG.QUALITY_STALE_TIME){
 
-quality.textContent=
+qualityText.textContent=
 "Waiting for new data";
 
-quality.style.color=
-"#FFD60A";
+quality.style.color="var(--orange)";
 
 rrCard.classList.add("stale");
 
@@ -933,7 +915,7 @@ rrCard.classList.remove("stale");
 
 if(intervals<3){
 
-quality.textContent=
+qualityText.textContent=
 "Collecting data";
 
 quality.style.color=
@@ -942,10 +924,6 @@ quality.style.color=
 return;
 
 }
-
-const qualityIntervals=
-
-intervals-qualityStartIntervals;
 
 const qualityElapsed=
 
@@ -959,7 +937,7 @@ qualityElapsed<CONFIG.QUALITY_READY_TIME
 
 ){
 
-quality.textContent=
+qualityText.textContent=
 "Improving accuracy";
 
 quality.style.color=
@@ -1028,6 +1006,10 @@ previous.textContent="Previous: --";
 
 earlier.textContent="Earlier: --";
 
+   currentRR=null;
+previousRR=null;
+earlierHistory=[];
+
 rrCard.style.borderColor="var(--green)";
 
 return;
@@ -1078,7 +1060,7 @@ if(rr>currentRR){
 
 trend.textContent="↑";
 
-}else if(rr<previousRR){
+}else if(rr<currentRR){
 
 trend.textContent="↓";
 
@@ -1207,13 +1189,14 @@ return;
 lastTapTime=now;
 
 lastInhaleTime=now;
-   if(staleResetRequired){
+if(staleResetRequired){
 
 qualityStartTime=now;
 
-qualityStartIntervals=
+/* Start counting from the NEXT completed interval */
+qualityStartIntervals=inhaleTimes.length;
 
-Math.max(0, inhaleTimes.length-1);
+qualityStable=false;
 
 staleResetRequired=false;
 
@@ -1257,6 +1240,13 @@ lastTapTime=0;
 lastInhaleTime=0;
 
 inhaleTimes=[];
+   qualityStable=false;
+
+staleResetRequired=false;
+
+qualityStartTime=0;
+
+qualityStartIntervals=0;
 
 currentRR=null;
 
@@ -1278,6 +1268,8 @@ earlier.textContent="Earlier: --";
 
 qualityText.textContent=
 "Waiting for first inhale";
+   qualityDots.textContent="";
+   qualityStable=false;
 
 quality.style.color=
 
