@@ -413,6 +413,29 @@ color:white;
 }
 
 /* =====================================================
+   FOOTER
+===================================================== */
+
+#footerBrand{
+
+text-align:center;
+
+font-size:12px;
+
+font-weight:500;
+
+color:var(--tertiary);
+
+opacity:.6;
+
+margin-top:4px;
+
+pointer-events:none;
+
+user-select:none;
+
+}
+/* =====================================================
    ANIMATIONS
 ===================================================== */
 
@@ -504,6 +527,10 @@ TAP EACH INHALE
 RESET
 </button>
 
+<div id="footerBrand">
+Ritti.co Digital Products
+</div>
+
 </div>
 
 <script>
@@ -517,17 +544,17 @@ NAME:"Res-Rate",
 
 YEAR:"2026",
 
-VERSION:"v2.2"
+VERSION:"v2.3"
 
 };
 
-document.title=`${APP.NAME} ${APP.VERSION}`;
+document.title=`${APP.NAME} ${APP.YEAR} · ${APP.VERSION}`;
 
 document.querySelector(
 'meta[name="apple-mobile-web-app-title"]'
 ).setAttribute(
 "content",
-`${APP.NAME} ${APP.VERSION}`
+`${APP.NAME} ${APP.YEAR}`
 );
 
 /* =====================================================
@@ -597,7 +624,7 @@ const resetButton=document.getElementById("resetButton");
 ===================================================== */
 
 credit.textContent=
-`Ritti.co | ${APP.NAME} ${APP.YEAR} · ${APP.VERSION}`;
+`${APP.NAME} ${APP.YEAR} · ${APP.VERSION}`;
 
 /* =====================================================
    STATE
