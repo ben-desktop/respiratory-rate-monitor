@@ -322,7 +322,7 @@ display:inline;
 
 display:inline-block;
 
-width:18px;
+width:auto;
 
 margin-left:2px;
 
@@ -334,7 +334,7 @@ transition:
 opacity .2s ease,
 transform .2s ease;
 
-}   
+}  
 /* =====================================================
    LOWER CARDS
 ===================================================== */
@@ -1011,6 +1011,7 @@ if(activeStates.includes(qualityText.textContent)){
 
 dotsFrame=(dotsFrame+1)%dots.length;
 
+qualityDots.style.display="inline-block";
 qualityDots.textContent=dots[dotsFrame];
 
 }else{
