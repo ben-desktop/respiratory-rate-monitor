@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Res-Rate">
+
+<title>Res-Rate</title>
+
+<style>
+
+/* =====================================================
+   APPLICATION
+===================================================== */
+
+:root{
+
+--blue:#0A84FF;
+--green:#30D158;
+--orange:#FF9F0A;
+--red:#FF453A;
+
+--bg:#000000;
+--card:#111111;
+
+--text:#FFFFFF;
+--secondary:#8E8E93;
+--tertiary:#6E6E73;
+
+}
+
+/* =====================================================
+   RESET
+===================================================== */
+
+*{
+
+margin:0;
+padding:0;
+box-sizing:border-box;
+
+-webkit-tap-highlight-color:transparent;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+
+user-select:none;
+
+}
+
+html,
+body{
+
+height:100%;
+overflow:hidden;
+
+background:var(--bg);
+
+font-family:
+-apple-system,
+BlinkMacSystemFont,
+"SF Pro Display",
+"SF Pro Text",
+sans-serif;
+
+color:var(--text);
+
+touch-action:manipulation;
+
+}
+
+body{
+
+display:flex;
+
+justify-content:center;
+align-items:center;
+
+padding:18px;
+
+}
+
+/* =====================================================
+   APP
+===================================================== */
+
+#app{
+
+width:min(430px,100%);
+
+display:flex;
+
+flex-direction:column;
+
+gap:16px;
+
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+#credit{
+
+text-align:center;
+
+font-size:13px;
+font-weight:500;
+
+letter-spacing:.4px;
+
+color:var(--tertiary);
+
+pointer-events:none;
+
+}
+
+/* =====================================================
+   MAIN CARD
+===================================================== */
+
+.card{
+
+background:var(--card);
+
+border:4px solid var(--green);
+
+border-radius:24px;
+
+padding:26px;
+
+transition:
+border-color .25s ease,
+opacity .25s ease;
+
+}
+
+.card.stale{
+
+opacity:.72;
+
+}
+
+/* =====================================================
+   DATE
+===================================================== */
+
+#dateTime{
+
+text-align:center;
+
+font-size:14px;
+
+color:var(--secondary);
+
+font-variant-numeric:tabular-nums;
+
+margin-bottom:14px;
+
+}
+
+/* =====================================================
+   RR
+===================================================== */
+
+#rrRow{
+
+display:flex;
+
+justify-content:center;
+align-items:flex-start;
+
+gap:10px;
+
+}
+
+#rrValue{
+
+font-size:90px;
+
+font-weight:700;
+
+line-height:.9;
+
+font-variant-numeric:tabular-nums;
+
+}
+
+#trend{
+
+margin-top:16px;
+
+font-size:24px;
+
+color:var(--secondary);
+
+transition:.2s;
+
+}
+
+#unit{
+
+margin-top:8px;
+
+text-align:center;
+
+font-size:24px;
+
+font-weight:500;
+
+color:var(--secondary);
+
+}
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+#status{
+
+margin-top:18px;
+
+text-align:center;
+
+font-size:18px;
+
+font-weight:700;
+
+transition:color .25s ease;
+
+}
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+#previous{
+
+margin-top:10px;
+
+text-align:center;
+
+font-size:14px;
+
+color:var(--secondary);
+
+transition:
+opacity .2s ease,
+transform .2s ease;
+
+}
+
+#earlier{
+
+margin-top:6px;
+
+text-align:center;
+
+font-size:14px;
+
+color:var(--secondary);
+
+}
+
+/* =====================================================
+   QUALITY
+===================================================== */
+
+#qualityTitle{
+
+margin-top:18px;
+
+text-align:center;
+
+font-size:13px;
+
+font-weight:600;
+
+letter-spacing:.4px;
+
+color:var(--secondary);
+
+}
+
+#quality{
+
+margin-top:8px;
+
+text-align:center;
+
+font-size:14px;
+
+font-weight:600;
+
+color:var(--secondary);
+
+transition:
+color .25s ease,
+opacity .25s ease;
+
+}
+
+/* =====================================================
+   LOWER CARDS
+===================================================== */
+
+.stats{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:14px;
+
+}
+
+.small{
+
+background:var(--card);
+
+border-radius:20px;
+
+padding:18px;
+
+}
+
+.label{
+
+text-align:center;
+
+font-size:14px;
+
+color:var(--secondary);
+
+margin-bottom:10px;
+
+}
+
+.value{
+
+text-align:center;
+
+font-size:30px;
+
+font-weight:600;
+
+font-variant-numeric:tabular-nums;
+
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+button{
+
+border:none;
+
+border-radius:22px;
+
+font-size:22px;
+
+font-weight:700;
+
+transition:
+background-color .18s ease,
+transform .1s ease;
+
+cursor:pointer;
+
+}
+
+button:active{
+
+transform:scale(.98);
+
+}
+
+#tapButton{
+
+padding:22px;
+
+background:var(--blue);
+
+color:white;
+
+animation:pulse 2.4s ease-in-out infinite;
+
+}
+
+#tapButton.flash{
+
+background:var(--green);
+
+animation:none;
+
+}
+
+#resetButton{
+
+padding:18px;
+
+background:#222;
+
+color:white;
+
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes pulse{
+
+0%{transform:scale(1);}
+50%{transform:scale(1.02);}
+100%{transform:scale(1);}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="app">
+
+<div id="credit"></div>
+
+<div id="rrCard" class="card">
+
+<div id="dateTime"></div>
+
+<div id="rrRow">
+
+<div id="rrValue">--</div>
+
+<div id="trend">→</div>
+
+</div>
+
+<div id="unit">rpm</div>
+
+<div id="status">READY</div>
+
+<div id="previous">
+Previous: --
+</div>
+
+<div id="earlier">
+Earlier: --
+</div>
+
+<div id="qualityTitle">
+Measurement Quality
+</div>
+
+<div id="quality">
+Waiting for first inhale
+</div>
+
+</div>
+
+<div class="stats">
+
+<div class="small">
+
+<div class="label">
+Measurement Time
+</div>
+
+<div id="stopwatch" class="value">
+00:00.00
+</div>
+
+</div>
+
+<div class="small">
+
+<div class="label">
+Inhales
+</div>
+
+<div id="inhaleCount" class="value">
+0
+</div>
+
+</div>
+
+</div>
+
+<button id="tapButton">
+TAP EACH INHALE
+</button>
+
+<button id="resetButton">
+RESET
+</button>
+
+</div>
+
+<script>
+/* =====================================================
+   APPLICATION
+===================================================== */
+
+const APP={
+
+NAME:"Res-Rate",
+
+YEAR:"2026",
+
+VERSION:"v2.2"
+
+};
+
+document.title=`${APP.NAME} ${APP.VERSION}`;
+
+document.querySelector(
+'meta[name="apple-mobile-web-app-title"]'
+).setAttribute(
+"content",
+`${APP.NAME} ${APP.VERSION}`
+);
+
+/* =====================================================
+   CONFIGURATION
+===================================================== */
+
+const CONFIG={
+
+ROLLING_INTERVALS:8,
+
+DOUBLE_TAP_MS:250,
+
+BUTTON_FLASH_MS:180,
+
+QUALITY_READY_INTERVALS:8,
+
+QUALITY_READY_TIME:30000,
+
+QUALITY_STALE_TIME:20000,
+
+STATUS:{
+
+LOW:12,
+
+NORMAL:20,
+
+ELEVATED:29
+
+}
+
+};
+
+/* =====================================================
+   DOM REFERENCES
+===================================================== */
+
+const credit=document.getElementById("credit");
+
+const rrCard=document.getElementById("rrCard");
+
+const dateTime=document.getElementById("dateTime");
+
+const rrValue=document.getElementById("rrValue");
+
+const trend=document.getElementById("trend");
+
+const unit=document.getElementById("unit");
+
+const status=document.getElementById("status");
+
+const previous=document.getElementById("previous");
+
+const earlier=document.getElementById("earlier");
+
+const quality=document.getElementById("quality");
+
+const stopwatch=document.getElementById("stopwatch");
+
+const inhaleCount=document.getElementById("inhaleCount");
+
+const tapButton=document.getElementById("tapButton");
+
+const resetButton=document.getElementById("resetButton");
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+credit.textContent=
+`Ritti.co | ${APP.NAME} ${APP.YEAR} · ${APP.VERSION}`;
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let measurementStarted=false;
+
+let measurementStart=0;
+
+let lastTapTime=0;
+
+let lastInhaleTime=0;
+
+let inhaleTimes=[];
+
+/* Current + previous history */
+
+let rrHistory=[];
+
+/* =====================================================
+   UTILITIES
+===================================================== */
+
+function formatStopwatch(ms){
+
+const total=ms/1000;
+
+const minutes=Math.floor(total/60);
+
+const seconds=Math.floor(total%60);
+
+const hundredths=Math.floor((total%1)*100);
+
+return(
+
+String(minutes).padStart(2,"0")+
+
+":"+
+
+String(seconds).padStart(2,"0")+
+
+"."+
+
+String(hundredths).padStart(2,"0")
+
+);
+
+}
+
+function updateDateTime(){
+
+const now=new Date();
+
+const day=String(now.getDate()).padStart(2,"0");
+
+const month=now.toLocaleString(
+"en-GB",
+{month:"short"}
+);
+
+const year=now.getFullYear();
+
+const hour=String(now.getHours()).padStart(2,"0");
+
+const minute=String(now.getMinutes()).padStart(2,"0");
+
+const second=String(now.getSeconds()).padStart(2,"0");
+
+dateTime.textContent=
+
+`${day} ${month} ${year} • ${hour}:${minute}:${second}`;
+
+}
+
+function getStatus(rr){
+
+if(rr<CONFIG.STATUS.LOW){
+
+return{
+
+label:"LOW",
+
+colour:"var(--blue)"
+
+};
+
+}
+
+if(rr<=CONFIG.STATUS.NORMAL){
+
+return{
+
+label:"NORMAL",
+
+colour:"var(--green)"
+
+};
+
+}
+
+if(rr<=CONFIG.STATUS.ELEVATED){
+
+return{
+
+label:"ELEVATED",
+
+colour:"var(--orange)"
+
+};
+
+}
+
+return{
+
+label:"CRITICAL",
+
+colour:"var(--red)"
+
+};
+
+}
+
+/* =====================================================
+   HISTORY
+===================================================== */
+
+function updateHistoryDisplay(){
+
+previous.textContent=
+
+rrHistory.length>1
+
+?`Previous: ${rrHistory[1]} rpm`
+
+:"Previous: --";
+
+if(rrHistory.length>2){
+
+earlier.textContent=
+
+"Earlier: "+
+
+rrHistory
+.slice(2,5)
+.join(" • ");
+
+}else{
+
+earlier.textContent="Earlier: --";
+
+}
+
+}
+
+/* =====================================================
+   MEASUREMENT QUALITY
+===================================================== */
+
+function updateQuality(now){
+
+if(!measurementStarted){
+
+quality.textContent=
+"Waiting for first inhale";
+
+quality.style.color=
+"var(--secondary)";
+
+rrCard.classList.remove("stale");
+
+return;
+
+}
+
+const intervals=
+
+Math.max(
+0,
+inhaleTimes.length-1
+);
+
+const elapsed=
+
+now-measurementStart;
+
+const stale=
+
+now-lastInhaleTime;
+
+if(stale>=CONFIG.QUALITY_STALE_TIME){
+
+quality.textContent=
+"Waiting for new data...";
+
+quality.style.color=
+"#FFD60A";
+
+rrCard.classList.add("stale");
+
+return;
+
+}
+
+rrCard.classList.remove("stale");
+
+if(intervals<4){
+
+quality.textContent=
+"Collecting data...";
+
+quality.style.color=
+"var(--blue)";
+
+return;
+
+}
+
+if(
+
+intervals<CONFIG.QUALITY_READY_INTERVALS||
+
+elapsed<CONFIG.QUALITY_READY_TIME
+
+){
+
+quality.textContent=
+"Improving accuracy...";
+
+quality.style.color=
+"var(--orange)";
+
+return;
+
+}
+
+quality.textContent=
+"✓ Stable rolling measurement";
+
+quality.style.color=
+"var(--green)";
+}
+
+/* =====================================================
+   RESPIRATORY RATE ENGINE
+===================================================== */
+
+function calculateRR(){
+
+if(inhaleTimes.length<2){
+
+rrValue.textContent="--";
+
+trend.textContent="→";
+
+status.textContent="READY";
+
+status.style.color="#FFFFFF";
+
+previous.textContent="Previous: --";
+
+earlier.textContent="Earlier: --";
+
+rrCard.style.borderColor="var(--green)";
+
+return;
+
+}
+
+const intervals=[];
+
+for(let i=1;i<inhaleTimes.length;i++){
+
+intervals.push(
+
+inhaleTimes[i]-inhaleTimes[i-1]
+
+);
+
+}
+
+const rolling=
+
+intervals.slice(
+
+-CONFIG.ROLLING_INTERVALS
+
+);
+
+const average=
+
+rolling.reduce(
+
+(a,b)=>a+b,
+
+0
+
+)/rolling.length;
+
+const rr=Math.round(
+
+60000/average
+
+);
+
+/* Trend */
+
+if(rrHistory.length){
+
+const previousRR=rrHistory[0];
+
+if(rr>previousRR){
+
+trend.textContent="↑";
+
+}else if(rr<previousRR){
+
+trend.textContent="↓";
+
+}else{
+
+trend.textContent="→";
+
+}
+
+}else{
+
+trend.textContent="→";
+
+}
+
+/* Update history */
+
+rrHistory.unshift(rr);
+
+rrHistory=rrHistory.slice(0,5);
+
+rrValue.textContent=rr;
+
+updateHistoryDisplay();
+
+/* Status */
+
+const state=getStatus(rr);
+
+status.textContent=state.label;
+
+status.style.color=state.colour;
+
+rrCard.style.borderColor=state.colour;
+
+}
+
+/* =====================================================
+   STOPWATCH
+===================================================== */
+
+function animationLoop(now){
+
+updateDateTime();
+
+if(measurementStarted){
+
+stopwatch.textContent=
+
+formatStopwatch(
+
+now-measurementStart
+
+);
+
+}
+
+updateQuality(now);
+
+requestAnimationFrame(animationLoop);
+
+}
+
+requestAnimationFrame(animationLoop);
+
+/* =====================================================
+   BUTTON FEEDBACK
+===================================================== */
+
+function flashButton(){
+
+tapButton.classList.add("flash");
+
+if(navigator.vibrate){
+
+navigator.vibrate(10);
+
+}
+
+setTimeout(()=>{
+
+tapButton.classList.remove("flash");
+
+},CONFIG.BUTTON_FLASH_MS);
+
+}
+
+/* =====================================================
+   TAP BUTTON
+===================================================== */
+
+tapButton.addEventListener("click",()=>{
+
+const now=performance.now();
+
+if(
+
+now-lastTapTime<CONFIG.DOUBLE_TAP_MS
+
+){
+
+return;
+
+}
+
+lastTapTime=now;
+
+lastInhaleTime=now;
+
+if(!measurementStarted){
+
+measurementStarted=true;
+
+measurementStart=now;
+
+}
+
+flashButton();
+
+inhaleTimes.push(now);
+
+inhaleCount.textContent=
+
+inhaleTimes.length;
+
+calculateRR();
+
+});
+
+/* =====================================================
+   RESET
+===================================================== */
+
+resetButton.addEventListener("click",()=>{
+
+measurementStarted=false;
+
+measurementStart=0;
+
+lastTapTime=0;
+
+lastInhaleTime=0;
+
+inhaleTimes=[];
+
+rrHistory=[];
+
+rrValue.textContent="--";
+
+trend.textContent="→";
+
+status.textContent="READY";
+
+status.style.color="#FFFFFF";
+
+previous.textContent="Previous: --";
+
+earlier.textContent="Earlier: --";
+
+quality.textContent=
+
+"Waiting for first inhale";
+
+quality.style.color=
+
+"var(--secondary)";
+
+rrCard.classList.remove("stale");
+
+rrCard.style.borderColor="var(--green)";
+
+stopwatch.textContent="00:00.00";
+
+inhaleCount.textContent="0";
+
+});
+
+/* =====================================================
+   ACCESSIBILITY
+===================================================== */
+
+["gesturestart","gesturechange","gestureend"]
+
+.forEach(type=>{
+
+document.addEventListener(
+
+type,
+
+e=>e.preventDefault()
+
+);
+
+});
+
+let lastTouchEnd=0;
+
+document.addEventListener(
+
+"touchend",
+
+e=>{
+
+const now=Date.now();
+
+if(now-lastTouchEnd<=300){
+
+e.preventDefault();
+
+}
+
+lastTouchEnd=now;
+
+},
+
+{passive:false}
+
+);
+
+/* =====================================================
+   INITIALISATION
+===================================================== */
+
+updateDateTime();
+
+unit.textContent="rpm";
+
+status.textContent="READY";
+
+trend.textContent="→";
+
+quality.textContent=
+
+"Waiting for first inhale";
+
+updateHistoryDisplay();
+
+</script>
+
+</body>
+
+</html>
