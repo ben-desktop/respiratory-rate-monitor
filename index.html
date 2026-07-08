@@ -269,13 +269,25 @@ color:var(--secondary);
 }
 
 
+#qualityCard{
+
+padding:16px 20px;
+
+}
+
 #quality{
 
-margin-top:8px;
+display:flex;
 
-text-align:center;
+justify-content:center;
 
-font-size:14px;
+align-items:center;
+
+gap:2px;
+
+min-height:22px;
+
+font-size:15px;
 
 font-weight:600;
 
@@ -287,6 +299,17 @@ opacity .25s ease;
 
 }
 
+#qualityDots{
+
+display:inline-block;
+
+width:18px;
+
+text-align:left;
+
+font-variant-numeric:tabular-nums;
+
+}
 /* =====================================================
    LOWER CARDS
 ===================================================== */
@@ -473,8 +496,14 @@ Earlier: --
     </div>
 
     <div id="quality">
-        Waiting for first inhale
-    </div>
+
+<span id="qualityText">
+Waiting for first inhale
+</span>
+
+<span id="qualityDots"></span>
+
+</div>
 
 </div>
 
@@ -598,6 +627,10 @@ const earlier=document.getElementById("earlier");
 
 const quality=document.getElementById("quality");
 
+const qualityText=document.getElementById("qualityText");
+
+const qualityDots=document.getElementById("qualityDots");
+
 const stopwatch=document.getElementById("stopwatch");
 
 const inhaleCount=document.getElementById("inhaleCount");
@@ -638,6 +671,10 @@ let staleResetRequired=false;
 let qualityStartTime=0;
 
 let qualityStartIntervals=0;
+
+let dotsFrame=0;
+
+const dots=["",".","..","..."];
 
 /* =====================================================
    UTILITIES
@@ -782,8 +819,10 @@ function updateQuality(now){
 
 if(!measurementStarted){
 
-quality.textContent=
+qualityText.textContent=
 "Waiting for first inhale";
+
+qualityDots.textContent="";
 
 quality.style.color=
 "var(--secondary)";
@@ -812,7 +851,7 @@ now-lastInhaleTime;
 if(stale>=CONFIG.QUALITY_STALE_TIME){
 
 quality.textContent=
-"Waiting for new data...";
+"Waiting for new data";
 
 quality.style.color=
 "#FFD60A";
@@ -832,7 +871,7 @@ rrCard.classList.remove("stale");
 if(intervals<3){
 
 quality.textContent=
-"Collecting data...";
+"Collecting data";
 
 quality.style.color=
 "var(--blue)";
@@ -858,7 +897,7 @@ qualityElapsed<CONFIG.QUALITY_READY_TIME
 ){
 
 quality.textContent=
-"Improving accuracy...";
+"Improving accuracy";
 
 quality.style.color=
 "var(--orange)";
@@ -869,13 +908,43 @@ return;
 
 qualityStable=true;
 
-quality.textContent=
+qualityText.textContent=
 "✓ Rolling measurement stable";
 
 quality.style.color=
 "var(--green)";
 }
 
+/* =====================================================
+   QUALITY DOTS
+===================================================== */
+
+setInterval(()=>{
+
+const activeStates=[
+
+"Collecting data",
+
+"Improving accuracy",
+
+"Waiting for new data"
+
+];
+
+if(activeStates.includes(qualityText.textContent)){
+
+dotsFrame=(dotsFrame+1)%dots.length;
+
+qualityDots.textContent=dots[dotsFrame];
+
+}else{
+
+qualityDots.textContent="";
+
+}
+
+},500);
+   
 /* =====================================================
    RESPIRATORY RATE ENGINE
 ===================================================== */
@@ -1122,8 +1191,7 @@ previous.textContent="Previous: --";
 
 earlier.textContent="Earlier: --";
 
-quality.textContent=
-
+qualityText.textContent=
 "Waiting for first inhale";
 
 quality.style.color=
@@ -1194,9 +1262,10 @@ status.textContent="READY";
 
 trend.textContent="→";
 
-quality.textContent=
-
+qualityText.textContent=
 "Waiting for first inhale";
+
+qualityDots.textContent="";
 
 updateHistoryDisplay();
 
