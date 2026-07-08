@@ -4,7 +4,7 @@
 <head>
 
 <meta charset="utf-8">
-
+   
 <meta name="viewport"
 content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 
@@ -542,11 +542,11 @@ DOUBLE_TAP_MS:250,
 
 BUTTON_FLASH_MS:180,
 
-QUALITY_READY_INTERVALS:8,
+QUALITY_READY_INTERVALS:6,
 
-QUALITY_READY_TIME:30000,
+QUALITY_READY_TIME:20000,
 
-QUALITY_STALE_TIME:20000,
+QUALITY_STALE_TIME:15000,
 
 STATUS:{
 
@@ -803,7 +803,7 @@ return;
 
 rrCard.classList.remove("stale");
 
-if(intervals<4){
+if(intervals<2){
 
 quality.textContent=
 "Collecting data...";
@@ -834,7 +834,7 @@ return;
 }
 
 quality.textContent=
-"✓ Stable rolling measurement";
+"✓ Rolling measurement stable";
 
 quality.style.color=
 "var(--green)";
