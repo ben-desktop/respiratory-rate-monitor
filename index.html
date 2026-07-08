@@ -283,7 +283,11 @@ padding:14px 20px 16px;
 
 #quality{
 
+position:relative;
+
 display:flex;
+
+justify-content:center;
 
 align-items:center;
 
@@ -302,16 +306,15 @@ transform .25s ease;
 
 }
 
-   #qualityText{
-
-flex:1;
-
-text-align:center;
 
 }
 #qualityDots{
 
-display:inline-block;
+position:absolute;
+
+left:50%;
+
+margin-left:calc(50% - 8px);
 
 width:18px;
 
@@ -319,11 +322,12 @@ text-align:left;
 
 font-variant-numeric:tabular-nums;
 
-   transition:
+transition:
 opacity .2s ease,
 transform .2s ease;
 
 }
+   
 /* =====================================================
    LOWER CARDS
 ===================================================== */
